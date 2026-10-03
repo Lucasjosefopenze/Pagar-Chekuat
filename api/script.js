@@ -1,7 +1,7 @@
 const crypto = require("node:crypto");
 
-const API_KEY = "COLOCAR API AQUI";
-const SIGNING_SECRET = "COLAR SECRET AQUI";
+const API_KEY = "sk_test_CdYHMPgPHHWYeGWicqw1zTb7GtlS6SdI9FfrcCB_q7M";
+const SIGNING_SECRET = "sig_test_2cBlDR5QwqiJlr32JqUYsKYODMI4-o_rnU5hCv5Fdkk";
 
 const API_URL = "https://api.pagar.co.mz/api/v1";
 
