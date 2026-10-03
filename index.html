@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="pt-MZ">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#0b0b0d">
+<meta name="color-scheme" content="light">
+<title>Pagar Checkout</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+--bg:#f4f5f7;
+--card:#fff;
+--text:#0b0b0d;
+--muted:#777b84;
+--line:#e7e8eb;
+--black:#0b0b0d;
+--green:#14965a;
+--red:#d93636
+}
+
+html,body{
+margin:0;
+padding:0;
+min-height:100%;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+button,input{
+font:inherit
+}
+
+button{
+-webkit-tap-highlight-color:transparent
+}
+
+.page{
+min-height:100dvh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:18px
+}
+
+.checkout{
+width:100%;
+max-width:430px
+}
+
+.brand{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:9px;
+margin-bottom:18px;
+font-size:22px;
+font-weight:850;
+letter-spacing:-.7px
+}
+
+.brand-icon{
+width:35px;
+height:35px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:11px;
+background:#0b0b0d;
+color:#fff;
+font-size:17px;
+font-weight:900
+}
+
+.card{
+width:100%;
+background:var(--card);
+border:1px solid var(--line);
+border-radius:25px;
+overflow:hidden;
+box-shadow:0 15px 50px rgba(0,0,0,.07)
+}
+
+.summary{
+padding:24px;
+border-bottom:1px solid var(--line)
+}
+
+.summary-label{
+color:var(--muted);
+font-size:11px;
+font-weight:800;
+letter-spacing:.3px;
+margin-bottom:8px
+}
+
+.product-name{
+margin:0 0 15px;
+font-size:21px;
+line-height:1.2;
+font-weight:800;
+letter-spacing:-.6px
+}
+
+.price-row{
+display:flex;
+align-items:baseline
+}
+
+.price{
+font-size:32px;
+line-height:1;
+font-weight:900;
+letter-spacing:-1.4px
+}
+
+.currency{
+margin-left:5px;
+color:var(--muted);
+font-size:14px;
+font-weight:750
+}
+
+.form-body{
+padding:23px
+}
+
+.label{
+display:block;
+margin-bottom:9px;
+font-size:13px;
+font-weight:800
+}
+
+.methods{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:20px
+}
+
+.method{
+position:relative;
+width:100%;
+min-height:67px;
+padding:13px;
+text-align:left;
+background:#fff;
+border:1.5px solid var(--line);
+border-radius:15px;
+cursor:pointer;
+transition:border-color .15s ease,background .15s ease,transform .15s ease
+}
+
+.method:active{
+transform:scale(.98)
+}
+
+.method.active{
+border-color:#0b0b0d;
+background:#f8f8f9;
+box-shadow:inset 0 0 0 1px #0b0b0d
+}
+
+.method-title{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:14px;
+font-weight:850
+}
+
+.method-description{
+display:block;
+margin-top:4px;
+color:var(--muted);
+font-size:11px
+}
+
+.field{
+margin-bottom:17px
+}
+
+.input{
+width:100%;
+height:54px;
+padding:0 15px;
+border:1px solid #dfe1e5;
+border-radius:14px;
+outline:none;
+background:#fff;
+color:#0b0b0d;
+font-size:15px;
+transition:border-color .15s ease,box-shadow .15s ease
+}
+
+.input::placeholder{
+color:#a4a7ae
+}
+
+.input:focus{
+border-color:#0b0b0d;
+box-shadow:0 0 0 3px rgba(0,0,0,.055)
+}
+
+.help{
+margin-top:7px;
+color:var(--muted);
+font-size:11px;
+line-height:1.45
+}
+
+.pay-button{
+width:100%;
+height:55px;
+border:0;
+border-radius:15px;
+background:#0b0b0d;
+color:#fff;
+font-size:15px;
+font-weight:850;
+cursor:pointer;
+transition:opacity .15s ease,transform .15s ease
+}
+
+.pay-button:active:not(:disabled){
+transform:scale(.985)
+}
+
+.pay-button:disabled{
+opacity:.55;
+cursor:not-allowed
+}
+
+.status{
+display:none;
+margin-top:14px;
+padding:14px;
+border-radius:14px;
+font-size:13px;
+line-height:1.45
+}
+
+.status.show{
+display:block
+}
+
+.status.info{
+color:#484c54;
+background:#f0f2f5
+}
+
+.status.success{
+color:#11663d;
+background:#eaf8f1
+}
+
+.status.error{
+color:#a12222;
+background:#fff0f0
+}
+
+.spinner{
+display:inline-block;
+width:17px;
+height:17px;
+margin-right:8px;
+vertical-align:-4px;
+border:2px solid rgba(255,255,255,.35);
+border-top-color:#fff;
+border-radius:50%;
+animation:spinner .7s linear infinite
+}
+
+@keyframes spinner{
+to{transform:rotate(360deg)}
+}
+
+.secure{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:5px;
+margin-top:15px;
+color:#999ca3;
+font-size:11px
+}
+
+.receipt{
+display:none;
+padding:27px 23px;
+text-align:center
+}
+
+.receipt.show{
+display:block
+}
+
+.success-icon{
+width:65px;
+height:65px;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:0 auto 15px;
+border-radius:50%;
+background:#eaf8f1;
+color:var(--green);
+font-size:30px;
+font-weight:900
+}
+
+.receipt-title{
+margin:0 0 7px;
+font-size:22px;
+font-weight:850;
+letter-spacing:-.5px
+}
+
+.receipt-text{
+margin:0;
+color:var(--muted);
+font-size:13px;
+line-height:1.5
+}
+
+.reference{
+margin-top:18px;
+padding:14px;
+border-radius:13px;
+background:#f6f6f7;
+font-size:12px;
+line-height:1.5;
+word-break:break-word
+}
+
+.new-payment{
+width:100%;
+height:46px;
+margin-top:15px;
+border:1px solid var(--line);
+border-radius:13px;
+background:#fff;
+color:#111;
+font-size:13px;
+font-weight:800;
+cursor:pointer
+}
+
+.footer{
+margin-top:14px;
+text-align:center;
+color:#999ca3;
+font-size:11px
+}
+
+.hidden{
+display:none!important
+}
+
+@media(max-width:430px){
+.page{padding:12px}
+.summary,.form-body{padding:19px}
+.price{font-size:30px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+<main class="checkout">
+
+<div class="brand">
+<div class="brand-icon">P</div>
+<span>Pagar Checkout</span>
+</div>
+
+<section class="card">
+
+<div class="summary">
+
+<div class="summary-label">
+RESUMO DA COMPRA
+</div>
+
+<h1 class="product-name" id="productName">
+Produto digital
+</h1>
+
+<div class="price-row">
+
+<span class="price" id="productAmount">
+250
+</span>
+
+<span class="currency">
+MZN
+</span>
+
+</div>
+
+</div>
+
+<div class="form-body" id="paymentForm">
+
+<label class="label">
+Método de pagamento
+</label>
+
+<div class="methods">
+
+<button
+type="button"
+class="method active"
+data-method="MPESA">
+
+<div class="method-title">
+<span>M-Pesa</span>
+</div>
+
+<span class="method-description">
+Pagamento móvel
+</span>
+
+</button>
+
+<button
+type="button"
+class="method"
+data-method="EMOLA">
+
+<div class="method-title">
+<span>e-Mola</span>
+</div>
+
+<span class="method-description">
+Pagamento móvel
+</span>
+
+</button>
+
+</div>
+
+<div class="field">
+
+<label class="label" for="phone">
+Número de telefone
+</label>
+
+<input
+id="phone"
+class="input"
+type="tel"
+inputmode="numeric"
+autocomplete="tel"
+maxlength="9"
+placeholder="841234567">
+
+<div class="help">
+Digite o número M-Pesa ou e-Mola que será usado para o pagamento.
+</div>
+
+</div>
+
+<button
+id="payButton"
+class="pay-button"
+type="button">
+
+Pagar 250 MZN
+
+</button>
+
+<div id="status" class="status"></div>
+
+<div class="secure">
+<span>🔒</span>
+<span>Pagamento seguro</span>
+</div>
+
+</div>
+
+<div id="receipt" class="receipt">
+
+<div class="success-icon">
+✓
+</div>
+
+<h2 class="receipt-title">
+Pagamento confirmado
+</h2>
+
+<p class="receipt-text">
+O seu pagamento foi confirmado com sucesso.
+</p>
+
+<div id="reference" class="reference"></div>
+
+<button
+class="new-payment"
+type="button"
+onclick="location.reload()">
+
+Voltar
+
+</button>
+
+</div>
+
+</section>
+
+<div class="footer">
+M-Pesa • e-Mola • Pagar
+</div>
+
+</main>
+</div>
+
+<script>
+
+const CONFIG = {
+endpoint:"/api/script.js",
+productName:"Produto digital",
+amount:250
+};
+
+let selectedMethod="MPESA";
+let paymentId=null;
+let polling=false;
+
+const productName=document.getElementById("productName");
+const productAmount=document.getElementById("productAmount");
+const phone=document.getElementById("phone");
+const payButton=document.getElementById("payButton");
+const statusBox=document.getElementById("status");
+const paymentForm=document.getElementById("paymentForm");
+const receipt=document.getElementById("receipt");
+const reference=document.getElementById("reference");
+
+productName.textContent=CONFIG.productName;
+
+productAmount.textContent=
+CONFIG.amount.toLocaleString("pt-MZ");
+
+payButton.textContent=
+"Pagar "+
+CONFIG.amount.toLocaleString("pt-MZ")+
+" MZN";
+
+document.querySelectorAll(".method").forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+document.querySelectorAll(".method")
+.forEach(item=>item.classList.remove("active"));
+
+button.classList.add("active");
+
+selectedMethod=button.dataset.method;
+
+});
+
+});
+
+phone.addEventListener("input",()=>{
+
+phone.value=
+phone.value.replace(/\D/g,"").slice(0,9);
+
+});
+
+function showStatus(message,type="info"){
+
+statusBox.className="status show "+type;
+statusBox.textContent=message;
+
+}
+
+function setLoading(loading){
+
+payButton.disabled=loading;
+
+if(loading){
+
+payButton.innerHTML=
+'<span class="spinner"></span>A processar pagamento...';
+
+}else{
+
+payButton.textContent=
+"Pagar "+
+CONFIG.amount.toLocaleString("pt-MZ")+
+" MZN";
+
+}
+
+}
+
+function validPhone(number){
+
+return /^(82|83|84|85|86|87)\d{7}$/.test(number);
+
+}
+
+async function startPayment(){
+
+const number=phone.value.trim();
+
+if(!validPhone(number)){
+
+showStatus(
+"Digite um número moçambicano válido com 9 dígitos.",
+"error"
+);
+
+phone.focus();
+return;
+
+}
+
+setLoading(true);
+
+showStatus(
+"A iniciar o pagamento. Aguarde a solicitação no seu telefone...",
+"info"
+);
+
+try{
+
+const response=await fetch(
+CONFIG.endpoint,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+method:selectedMethod,
+payerPhone:number,
+product:CONFIG.productName,
+amount:CONFIG.amount
+})
+}
+);
+
+const data=await response.json().catch(()=>({}));
+
+if(!response.ok){
+
+throw new Error(
+data.message||
+"Não foi possível iniciar o pagamento."
+);
+
+}
+
+const payment=data.payment||data;
+
+paymentId=
+data.paymentId||
+payment.id||
+data.id;
+
+if(!paymentId){
+
+throw new Error(
+"O servidor não devolveu o ID do pagamento."
+);
+
+}
+
+if(payment.status==="PAID"){
+
+paymentSuccess(payment);
+return;
+
+}
+
+showStatus(
+"Pagamento iniciado. Confirme no seu telefone. Estamos aguardando a confirmação...",
+"info"
+);
+
+monitorPayment();
+
+}catch(error){
+
+setLoading(false);
+
+showStatus(
+error.message||
+"Ocorreu um erro.",
+"error"
+);
+
+}
+
+}
+
+async function monitorPayment(){
+
+if(polling)return;
+
+polling=true;
+
+const started=Date.now();
+const timeout=180000;
+
+async function check(){
+
+if(Date.now()-started>timeout){
+
+polling=false;
+setLoading(false);
+
+showStatus(
+"O tempo de confirmação terminou. Verifique o estado do pagamento antes de tentar novamente.",
+"error"
+);
+
+return;
+
+}
+
+try{
+
+const response=await fetch(
+CONFIG.endpoint+
+"?action=status&paymentId="+
+encodeURIComponent(paymentId),
+{
+cache:"no-store"
+}
+);
+
+const data=await response.json().catch(()=>({}));
+
+if(!response.ok){
+
+throw new Error(
+data.message||
+"Erro ao consultar pagamento."
+);
+
+}
+
+const payment=data.payment||data;
+const status=payment.status;
+
+if(status==="PAID"){
+
+polling=false;
+paymentSuccess(payment);
+return;
+
+}
+
+if(status==="FAILED"){
+
+polling=false;
+setLoading(false);
+
+showStatus(
+payment.failureReason||
+"O pagamento falhou.",
+"error"
+);
+
+return;
+
+}
+
+if(status==="CANCELLED"){
+
+polling=false;
+setLoading(false);
+
+showStatus(
+"O pagamento foi cancelado.",
+"error"
+);
+
+return;
+
+}
+
+if(status==="RECONCILIATION_REQUIRED"){
+
+polling=false;
+setLoading(false);
+
+showStatus(
+"A transação está em reconciliação. Não faça uma segunda cobrança.",
+"error"
+);
+
+return;
+
+}
+
+setTimeout(check,12000);
+
+}catch(error){
+
+setTimeout(check,12000);
+
+}
+
+}
+
+check();
+
+}
+
+function paymentSuccess(payment){
+
+setLoading(false);
+
+paymentForm.classList.add("hidden");
+receipt.classList.add("show");
+
+const id=payment.id||paymentId;
+
+const ref=
+payment.reference||
+"Pagamento confirmado";
+
+reference.innerHTML=
+"<strong>Referência</strong><br>"+
+escapeHTML(ref)+
+"<br><br>"+
+"<strong>ID do pagamento</strong><br>"+
+escapeHTML(id);
+
+}
+
+function escapeHTML(value){
+
+return String(value).replace(
+/[&<>"']/g,
+character=>{
+
+const map={
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+};
+
+return map[character];
+
+}
+);
+
+}
+
+payButton.addEventListener(
+"click",
+startPayment
+);
+
+</script>
+
+</body>
+</html>
